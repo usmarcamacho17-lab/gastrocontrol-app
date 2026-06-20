@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mi Calculadora — GastroControl</title>
+<style>
+html, body { margin:0; padding:0; width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
+* { box-sizing:border-box; }
+body {
+  background: #0E0E12;
+  color: #E8E8F0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 72px;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(160deg, #14141C 0%, #1A1A24 100%);
+  border-bottom: 1px solid #FFFFFF12;
+  padding: 14px 16px 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hd-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: linear-gradient(135deg, #2A2A3A, #1A1A28);
+  border: 1.5px solid #FFFFFF18;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.hd-text { flex:1; min-width:0; }
+.hd-name { font-size:15px; font-weight:800; color:#fff; letter-spacing:0.3px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hd-sub  { font-size:9px; color:#6A6A8A; letter-spacing:1px; margin-top:3px; text-transform:uppercase; }
+.btn-salir {
+  background: #FFFFFF12; color: #A0A0C0; border: 1px solid #FFFFFF18;
+  font-size:11px; font-weight:700; padding:7px 12px;
+  border-radius:10px; cursor:pointer; flex-shrink:0;
+}
+
+/* TABS */
+.tabs-wrap {
+  display: flex; gap: 8px; margin: 12px 14px 0;
+}
+.tab-btn {
+  flex: 1; background: #14141C; border: 1.5px solid #1E1E2A;
+  border-radius: 12px; padding: 11px 6px;
+  font-size: 11px; font-weight: 800; color: #4A4A6A;
+  cursor: pointer; letter-spacing: 0.3px; transition: all .15s;
+}
+.tab-btn.on { background: #6C63FF; border-color: #6C63FF; color: #fff; }
+
+.pagina { display: none; padding: 14px; }
+.pagina.on { display: block; }
+
+/* TASAS */
+.tasas-wrap {
+  background: #14141C; border: 1.5px solid #FFFFFF12;
+  border-radius: 18px; padding: 14px; margin-bottom: 14px;
+}
+.tasas-titulo { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:#4A4A6A; margin-bottom:10px; }
+.tasas-fila { display:flex; gap:10px; width:100%; }
+.tasa-item { flex:1; min-width:0; border-radius:12px; padding:11px 12px; }
+.tasa-item.bcv { background:#12100A; border:1.5px solid #E8A53055; }
+.tasa-item.bnc { background:#081208; border:1.5px solid #27AE6055; }
+.tasa-nombre { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:7px; display:flex; align-items:center; gap:5px; }
+.tasa-item.bcv .tasa-nombre { color:#E8A530; }
+.tasa-item.bnc .tasa-nombre { color:#27AE60; }
+.tdot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.tasa-item.bcv .tdot { background:#E8A530; }
+.tasa-item.bnc .tdot { background:#27AE60; }
+.tasa-campo { background:#0A0A0E; border-radius:8px; padding:8px; display:flex; align-items:center; width:100%; }
+.tbs  { font-size:11px; font-weight:700; color:#3A3A5A; flex-shrink:0; }
+.tnum { flex:1; min-width:0; background:transparent; border:none; outline:none; text-align:center; font-size:20px; font-weight:900; -moz-appearance:textfield; width:100%; }
+.tnum::-webkit-inner-spin-button, .tnum::-webkit-outer-spin-button { -webkit-appearance:none; }
+.tasa-item.bcv .tnum { color:#E8A530; }
+.tasa-item.bnc .tnum { color:#27AE60; }
+.tdol { font-size:11px; color:#2A2A4A; font-weight:700; flex-shrink:0; }
+
+/* BUSCADOR */
+.buscador-wrap {
+  background: #14141C; border: 1.5px solid #FFFFFF18;
+  border-radius: 14px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.buscador-ico { font-size: 16px; color: #4A4A6A; flex-shrink: 0; }
+.buscador-inp {
+  flex: 1; min-width: 0; background: transparent; border: none; outline: none;
+  color: #E8E8F0; font-size: 15px; font-weight: 600;
+}
+.buscador-inp::placeholder { color: #3A3A5A; font-weight: 400; }
+
+.sep {
+  display:flex; align-items:center; gap:10px; margin: 14px 0 10px;
+  font-size:9px; font-weight:800; letter-spacing:2.5px;
+  text-transform:uppercase; color:#3A3A5A;
+}
+.sep::before, .sep::after { content:''; flex:1; height:1px; background:#FFFFFF0A; }
+
+/* CARDS PRECIOS */
+.lista { display:flex; flex-direction:column; gap:12px; }
+.pcard { background: #14141C; border: 1.5px solid #1E1E2A; border-radius: 18px; overflow:hidden; }
+.pc-head { background: #1A1A24; border-bottom: 1px solid #1E1E2A; padding: 12px 14px; display:flex; align-items:center; gap:10px; }
+.pc-title { flex:1; min-width:0; }
+.pc-nombre { font-size:14px; font-weight:800; color:#E8E8F0; line-height:1.2; }
+.pc-desc { font-size:10px; color:#5A5A7A; margin-top:3px; }
+.pc-usd-box { background: #0A0A14; border:1.5px solid #6C63FF44; border-radius:10px; padding:6px 10px; display:flex; align-items:center; gap:3px; flex-shrink:0; }
+.pc-usd-s { font-size:13px; color:#6C63FF; font-weight:700; }
+.pc-usd-inp { background:transparent; border:none; outline:none; font-size:18px; font-weight:900; color:#9B93FF; width:58px; text-align:right; -moz-appearance:textfield; }
+.pc-usd-inp::-webkit-inner-spin-button, .pc-usd-inp::-webkit-outer-spin-button { -webkit-appearance:none; }
+.pc-body { padding:14px; }
+.pc-vals { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.ptasa { border-radius:10px; padding:9px 11px; }
+.ptasa.pb { background:#12100A; border:1px solid #E8A53033; }
+.ptasa.pn { background:#081208; border:1px solid #27AE6033; }
+.ptasa-lbl { font-size:8px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; display:flex; align-items:center; gap:4px; margin-bottom:4px; }
+.ptasa.pb .ptasa-lbl { color:#E8A53077; }
+.ptasa.pn .ptasa-lbl { color:#27AE6077; }
+.ptasa-dot { width:5px; height:5px; border-radius:50%; }
+.ptasa.pb .ptasa-dot { background:#E8A530; }
+.ptasa.pn .ptasa-dot { background:#27AE60; }
+.ptasa-val { font-size:13px; font-weight:900; }
+.ptasa.pb .ptasa-val { color:#E8A530; }
+.ptasa.pn .ptasa-val { color:#27AE60; }
+
+/* GANANCIA en card precios */
+.pc-gan-box { display:flex; align-items:center; gap:6px; background:#0A0A14; border:1.5px solid #6C63FF44; border-radius:10px; padding:5px 9px; margin-top:8px; }
+.pc-gan-lbl { font-size:9px; color:#4A4A7A; font-weight:700; }
+.pc-gan-inp { background:transparent; border:none; outline:none; font-size:14px; font-weight:900; color:#9B93FF; width:34px; text-align:center; -moz-appearance:textfield; }
+.pc-gan-inp::-webkit-inner-spin-button, .pc-gan-inp::-webkit-outer-spin-button { -webkit-appearance:none; }
+.pc-gan-pct { font-size:11px; color:#6C63FF; font-weight:800; }
+
+/* ═══ FORMATO DISTRIBUIDOR ═══ */
+.pcard-dist {
+  background: #14141C; border: 1.5px solid #1E1E2A;
+  border-radius: 18px; padding: 14px; margin-bottom: 0;
+}
+.pcd-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.pcd-num {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: #FFFFFF0C; border: 1px solid #FFFFFF18;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900; color: #6A6A8A; flex-shrink: 0;
+}
+.pcd-title { flex: 1; min-width: 0; }
+.pcd-nombre { font-size: 14px; font-weight: 800; color: #E8E8F0; line-height: 1.2; }
+.pcd-desc { font-size: 9px; color: #3A3A5A; margin-top: 2px; }
+
+.pcd-dist-box { background: #0A0A0E; border-radius: 12px; padding: 11px 13px; margin-bottom: 11px; border: 1px solid #FFFFFF08; }
+.pcd-dist-titulo { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #3A3A5A; margin-bottom: 8px; }
+.pcd-dist-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pcd-dist-lbl { font-size: 8px; color: #3A3A5A; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+.pcd-dist-inp {
+  width: 100%; background: #16161E; border: 1px solid #2A2A3A;
+  border-radius: 8px; color: #C9C0D8; font-size: 14px; font-weight: 800;
+  padding: 7px 9px; outline: none; -moz-appearance: textfield;
+}
+.pcd-dist-inp::-webkit-inner-spin-button, .pcd-dist-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+.pcd-dist-inp.base { color: #E8A530; }
+.pcd-dist-inp.total { color: #4A9EFF; }
+.pcd-dist-inp:focus { border-color: #6C63FF; }
+
+.pcd-venta-box {
+  background: linear-gradient(135deg, #12103A, #0E0C2A);
+  border: 1.5px solid #6C63FF33; border-radius: 12px;
+  padding: 12px 13px; margin: 11px 0;
+}
+.pcd-venta-titulo {
+  font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+  color: #6C63FF88; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+}
+.pcd-venta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pcd-venta-lbl { font-size: 8px; color: #4A4A7A; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+.pcd-venta-val { font-size: 15px; font-weight: 900; color: #9B93FF; }
+.pcd-venta-val.usd { color: #6C63FF; font-size: 18px; }
+.pcd-venta-val.verde { color: #27AE60; }
+
+.pcd-unidad-box {
+  background: linear-gradient(135deg, #0A1A0E, #081208);
+  border: 1.5px solid #27AE6044; border-radius: 12px;
+  padding: 12px 13px; margin-bottom: 11px;
+}
+.pcd-unidad-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pcd-unidad-titulo { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #27AE6099; }
+.pcd-uxc-box { display: flex; align-items: center; gap: 5px; background: #0A0A0E; border: 1px solid #27AE6044; border-radius: 8px; padding: 5px 8px; }
+.pcd-uxc-lbl { font-size: 8px; color: #3A5A3A; font-weight: 700; }
+.pcd-uxc-inp { background: transparent; border: none; outline: none; font-size: 13px; font-weight: 900; color: #27AE60; width: 30px; text-align: center; -moz-appearance: textfield; }
+.pcd-uxc-inp::-webkit-inner-spin-button, .pcd-uxc-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.pcd-semaforos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sem-item {
+  background: #0A0A0E; border: 1px solid #FFFFFF08; border-radius: 10px;
+  padding: 9px 11px; display: flex; align-items: center; gap: 8px;
+}
+.sem-lbl { font-size: 10px; font-weight: 700; color: #4A4A6A; flex: 1; }
+.sem-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.dot-verde    { background: #27AE60; box-shadow: 0 0 8px #27AE6066; }
+.dot-amarillo { background: #F0B429; box-shadow: 0 0 8px #F0B42966; }
+.dot-rojo     { background: #E74C3C; box-shadow: 0 0 8px #E74C3C66; }
+
+/* INVENTARIO */
+.inv-resumen { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.inv-rcard { background: #14141C; border: 1px solid #1E1E2A; border-radius: 14px; padding: 11px 8px; text-align: center; }
+.inv-rcard.rojo  { border-top: 2.5px solid #E74C3C; }
+.inv-rcard.azul  { border-top: 2.5px solid #4A9EFF; }
+.inv-rcard.verde { border-top: 2.5px solid #27AE60; }
+.inv-rlbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #4A4A6A; margin-bottom: 4px; }
+.inv-rval { font-size: 18px; font-weight: 900; }
+.inv-rcard.rojo  .inv-rval { color: #E74C3C; }
+.inv-rcard.azul  .inv-rval { color: #4A9EFF; }
+.inv-rcard.verde .inv-rval { color: #27AE60; }
+
+.invp-card { background: #14141C; border: 1.5px solid #1E1E2A; border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+.invp-card.bajo { border-left: 3px solid #E74C3C; }
+.invp-top { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+.invp-info { flex: 1; min-width: 0; }
+.invp-nombre { font-size: 13px; font-weight: 800; color: #E8E8F0; line-height: 1.2; }
+.invp-stock-box { text-align: right; flex-shrink: 0; }
+.invp-stock-num {
+  font-size: 22px; font-weight: 900; color: #C9C0FF; line-height: 1;
+  background: #0A0A0E; border: 1.5px solid #2A2A4A; border-radius: 8px;
+  width: 64px; text-align: center; padding: 4px 2px; outline: none; -moz-appearance: textfield;
+}
+.invp-stock-num::-webkit-inner-spin-button, .invp-stock-num::-webkit-outer-spin-button { -webkit-appearance: none; }
+.invp-card.bajo .invp-stock-num { color: #E74C3C; border-color: #E74C3C44; }
+.invp-stock-lbl { font-size: 8px; color: #4A4A6A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+.invp-actions { display: flex; align-items: center; gap: 8px; }
+.btn-venta-rapida { background: #E74C3C; color: #fff; border: none; border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.invp-cant-box { flex: 1; display: flex; align-items: center; gap: 6px; background: #0A0A0E; border: 1.5px solid #2A2A3A; border-radius: 10px; padding: 6px 10px; }
+.invp-cant-inp { flex: 1; background: transparent; border: none; outline: none; color: #E8E8F0; font-size: 14px; font-weight: 700; text-align: center; -moz-appearance: textfield; min-width: 0; }
+.invp-cant-inp::-webkit-inner-spin-button, .invp-cant-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+.btn-vender-cant { background: #6C63FF; color: #fff; border: none; border-radius: 8px; padding: 7px 12px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+
+/* ANALÍTICA */
+.periodo-wrap { display: flex; gap: 8px; margin-bottom: 14px; }
+.periodo-btn { flex: 1; background: #14141C; border: 1.5px solid #1E1E2A; border-radius: 10px; padding: 9px 6px; font-size: 11px; font-weight: 700; color: #4A4A6A; cursor: pointer; }
+.periodo-btn.on { background: #C9A84C22; border-color: #C9A84C; color: #C9A84C; }
+
+.an-resumen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.an-rcard { background: #14141C; border: 1px solid #1E1E2A; border-radius: 16px; padding: 14px 13px 12px; }
+.an-rcard.verde { border-top: 2.5px solid #27AE60; }
+.an-rcard.oro   { border-top: 2.5px solid #C9A84C; }
+.an-rlbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #4A4A6A; margin-bottom: 6px; }
+.an-rval { font-size: 24px; font-weight: 900; line-height: 1; }
+.an-rcard.verde .an-rval { color: #27AE60; }
+.an-rcard.oro   .an-rval { color: #C9A84C; }
+.an-rsub { font-size: 9px; color: #3A3A5A; margin-top: 4px; }
+
+.top-card { background: #14141C; border: 1.5px solid #1E1E2A; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.top-pos { width: 26px; height: 26px; border-radius: 8px; background: #C9A84C22; color: #C9A84C; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; flex-shrink: 0; }
+.top-info { flex: 1; min-width: 0; }
+.top-nombre { font-size: 13px; font-weight: 700; color: #E8E8F0; }
+.top-det { font-size: 10px; color: #4A4A6A; margin-top: 2px; }
+.top-num { text-align: right; flex-shrink: 0; }
+.top-cant { font-size: 16px; font-weight: 900; color: #6C63FF; }
+.top-cant-lbl { font-size: 8px; color: #3A3A5A; }
+
+.hist-item { background: #14141C; border: 1px solid #1E1E2A; border-radius: 12px; padding: 11px 13px; display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.hist-ico { font-size: 16px; flex-shrink: 0; }
+.hist-info { flex: 1; min-width: 0; }
+.hist-nombre { font-size: 12px; font-weight: 700; color: #C9C0D8; }
+.hist-meta { font-size: 9px; color: #3A3A5A; margin-top: 1px; }
+.hist-monto { font-size: 13px; font-weight: 800; color: #27AE60; flex-shrink: 0; }
+
+.vacio-sec { text-align: center; padding: 30px 16px; color: #2A2A40; font-size: 13px; }
+.vacio-sec .vico { font-size: 32px; margin-bottom: 8px; opacity: .5; }
+
+/* BOTONES GENERALES */
+.btn-nuevo-prod {
+  width: 100%; margin-top: 14px;
+  background: linear-gradient(135deg, #6C63FF, #5048E0);
+  color: #fff; border: none; border-radius: 14px;
+  padding: 14px; font-size: 14px; font-weight: 800; cursor: pointer; letter-spacing: 0.3px;
+}
+
+/* MODAL */
+.modal-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 9999; align-items: flex-end; }
+.modal-fondo.abierto { display: flex; }
+.modal-caja { background: #14141C; width: 100%; border-radius: 24px 24px 0 0; padding: 20px 18px 36px; max-height: 90vh; overflow-y: auto; border-top: 1.5px solid #6C63FF44; }
+.modal-tit { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.modal-x { background: #1E1E2A; border: none; border-radius: 50%; width: 32px; height: 32px; color: #4A4A6A; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.campo { width: 100%; background: #0A0A0E; border: 1.5px solid #1E1E2A; border-radius: 12px; color: #E8E8F0; font-size: 14px; padding: 12px 13px; outline: none; -moz-appearance: textfield; }
+.campo::-webkit-inner-spin-button, .campo::-webkit-outer-spin-button { -webkit-appearance: none; }
+.campo:focus { border-color: #6C63FF; }
+.campo::placeholder { color: #2A2A40; }
+.campo-lbl { font-size: 11px; color: #4A4A6A; font-weight: 600; margin-bottom: 5px; }
+.campo-wrap { margin-bottom: 12px; }
+.campo-doble { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.boton-modal { width: 100%; background: #6C63FF; color: #fff; border: none; border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 800; cursor: pointer; margin-top: 4px; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: #27AE60; color: #fff; padding: 10px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; z-index: 10000;
+  opacity: 0; transition: opacity .3s; pointer-events: none; max-width: 88%; text-align: center;
+}
+.toast.vis { opacity: 1; }
+.toast.err { background: #E74C3C; }
+
+.footer { margin:28px 0 0; border-top:1px solid #1A1A24; padding-top:16px; text-align:center; }
+.footer-brand { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:#4A4A6A; font-weight:800; }
+.footer-tag { font-size:10px; color:#2A2A3A; margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hd-icon">📦</div>
+  <div class="hd-text">
+    <div class="hd-name" id="hd-negocio">Cargando...</div>
+    <div class="hd-sub">Tu calculadora · GastroControl</div>
+  </div>
+  <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+</div>
+
+<div class="tabs-wrap">
+  <button class="tab-btn on" id="tab-precios" onclick="irTab('precios')">💲 Precios</button>
+  <button class="tab-btn" id="tab-inventario" onclick="irTab('inventario')">📦 Stock</button>
+  <button class="tab-btn" id="tab-analitica" onclick="irTab('analitica')">📈 Analítica</button>
+</div>
+
+<!-- ═══ PRECIOS ═══ -->
+<div class="pagina on" id="pagina-precios">
+  <div class="tasas-wrap">
+    <div class="tasas-titulo">Tasas del día</div>
+    <div class="tasas-fila">
+      <div class="tasa-item bcv">
+        <div class="tasa-nombre"><span class="tdot"></span>🏦 BCV</div>
+        <div class="tasa-campo">
+          <span class="tbs">Bs./</span>
+          <input class="tnum" id="tBCV" type="number" value="38.50" step="0.01" inputmode="decimal" oninput="upd()">
+          <span class="tdol">$</span>
+        </div>
+      </div>
+      <div class="tasa-item bnc">
+        <div class="tasa-nombre"><span class="tdot"></span>🟢 Binance</div>
+        <div class="tasa-campo">
+          <span class="tbs">Bs./</span>
+          <input class="tnum" id="tBNC" type="number" value="40.20" step="0.01" inputmode="decimal" oninput="upd()">
+          <span class="tdol">$</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="buscador-wrap">
+    <span class="buscador-ico">🔍</span>
+    <input class="buscador-inp" id="buscador" placeholder="Buscar producto..." oninput="filtrarYRenderizar()">
+  </div>
+
+  <div class="sep">Tus productos</div>
+  <div class="lista" id="lista-precios">
+    <div class="vacio-sec"><div class="vico">⏳</div>Cargando...</div>
+  </div>
+
+  <button class="btn-nuevo-prod" onclick="abrirModalNuevo()">+ Agregar producto</button>
+</div>
+
+<!-- ═══ INVENTARIO ═══ -->
+<div class="pagina" id="pagina-inventario">
+  <div class="inv-resumen">
+    <div class="inv-rcard rojo"><div class="inv-rlbl">Stock bajo</div><div class="inv-rval" id="inv-bajo">0</div></div>
+    <div class="inv-rcard azul"><div class="inv-rlbl">Productos</div><div class="inv-rval" id="inv-total">0</div></div>
+    <div class="inv-rcard verde"><div class="inv-rlbl">Unidades</div><div class="inv-rval" id="inv-unidades">0</div></div>
+  </div>
+  <div class="buscador-wrap">
+    <span class="buscador-ico">🔍</span>
+    <input class="buscador-inp" id="buscador-inv" placeholder="Buscar producto..." oninput="renderInventario()">
+  </div>
+  <div class="sep">Stock por producto</div>
+  <div class="lista" id="lista-inventario"></div>
+</div>
+
+<!-- ═══ ANALÍTICA ═══ -->
+<div class="pagina" id="pagina-analitica">
+  <div class="periodo-wrap">
+    <button class="periodo-btn on" id="per-semana" onclick="cambiarPeriodo('semana')">Semanal</button>
+    <button class="periodo-btn" id="per-quincena" onclick="cambiarPeriodo('quincena')">Quincenal</button>
+    <button class="periodo-btn" id="per-mes" onclick="cambiarPeriodo('mes')">Mensual</button>
+  </div>
+  <div class="an-resumen">
+    <div class="an-rcard verde">
+      <div class="an-rlbl">Unidades vendidas</div>
+      <div class="an-rval" id="an-unidades">0</div>
+      <div class="an-rsub" id="an-periodo-txt">Esta semana</div>
+    </div>
+    <div class="an-rcard oro">
+      <div class="an-rlbl">Utilidad generada</div>
+      <div class="an-rval" id="an-utilidad">$0.00</div>
+      <div class="an-rsub">Ganancia neta</div>
+    </div>
+  </div>
+  <div class="sep">Top productos más vendidos</div>
+  <div class="lista" id="lista-top"></div>
+  <div class="sep">Historial de ventas</div>
+  <div class="lista" id="lista-historial"></div>
+</div>
+
+<div class="footer">
+  <div class="footer-brand">GastroControl</div>
+  <div class="footer-tag">No se trata de vender más. Se trata de ganar mejor.</div>
+</div>
+
+<!-- MODAL NUEVO PRODUCTO -->
+<div class="modal-fondo" id="modal-nuevo">
+  <div class="modal-caja">
+    <div class="modal-tit">📦 Nuevo producto <button class="modal-x" onclick="cerrarModal()">×</button></div>
+    <div class="campo-wrap"><div class="campo-lbl">Nombre</div><input class="campo" id="np-nombre" placeholder="Ej: Harina Pan 1kg"></div>
+    <div class="campo-wrap"><div class="campo-lbl">Descripción (opcional)</div><input class="campo" id="np-desc" placeholder="Detalle"></div>
+    <div class="campo-doble">
+      <div><div class="campo-lbl">Precio $</div><input class="campo" id="np-usd" type="number" placeholder="0.00" step="0.01" inputmode="decimal"></div>
+      <div><div class="campo-lbl">Stock inicial</div><input class="campo" id="np-stock" type="number" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="campo-doble" id="np-dist-row" style="display:none">
+      <div><div class="campo-lbl">Base Bs. s/IVA</div><input class="campo" id="np-base-bs" type="number" placeholder="0.00" step="0.01" inputmode="decimal"></div>
+      <div><div class="campo-lbl">Total Bs. c/IVA</div><input class="campo" id="np-total-bs" type="number" placeholder="0.00" step="0.01" inputmode="decimal"></div>
+    </div>
+    <div class="campo-doble">
+      <div><div class="campo-lbl">Unid. por caja</div><input class="campo" id="np-uxc" type="number" value="1" inputmode="numeric"></div>
+      <div><div class="campo-lbl">% Ganancia</div><input class="campo" id="np-gan" type="number" value="30" inputmode="numeric"></div>
+    </div>
+    <div class="campo-wrap"><div class="campo-lbl">Alerta cuando baje de</div><input class="campo" id="np-min" type="number" placeholder="0" inputmode="numeric"></div>
+    <button class="boton-modal" onclick="guardarProducto()">Guardar producto</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════ CONFIG SUPABASE ═══════════
+const SUPABASE_URL = 'https://mcknncjahkibnbgogmgb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_fxgangMM5b2DmTp48aXEIg_ei_bhVgx';
+const headers = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
+
+// ═══════════ SESIÓN ═══════════
+const usuarioActual = sessionStorage.getItem('gc_usuario');
+const negocioActual = sessionStorage.getItem('gc_negocio');
+const TIPO_CALCULADORA = sessionStorage.getItem('gc_tipo_calc') || 'simple';
+if(!usuarioActual){ window.location.href = 'login.html'; }
+document.getElementById('hd-negocio').textContent = negocioActual || usuarioActual;
+function cerrarSesion(){
+  sessionStorage.removeItem('gc_usuario');
+  sessionStorage.removeItem('gc_negocio');
+  window.location.href = 'login.html';
+}
+
+// ═══════════ ESTADO ═══════════
+let PRODUCTOS = [];
+let VENTAS = [];
+let periodoActual = 'semana';
+
+function toast(msg, esError){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast vis' + (esError ? ' err' : '');
+  setTimeout(() => { t.className = 'toast'; }, 2200);
+}
+function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function gt(){ return {b:parseFloat(document.getElementById('tBCV').value)||0, n:parseFloat(document.getElementById('tBNC').value)||0}; }
+function fbs(v,t){ if(!v||!t) return 'Bs. —'; const r=v*t; return r>=1000?'Bs. '+Math.round(r).toLocaleString('es-VE'):'Bs. '+r.toFixed(2).replace('.',','); }
+function fd(v){ return '$'+parseFloat(v||0).toFixed(2); }
+
+// ═══════════ TABS ═══════════
+function irTab(tab){
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('pagina-'+tab).classList.add('on');
+  document.getElementById('tab-'+tab).classList.add('on');
+  if(tab === 'inventario') renderInventario();
+  if(tab === 'analitica') renderAnalitica();
+}
+
+// ═══════════ CARGAR DATOS ═══════════
+async function cargarProductos(){
+  try{
+    const resp = await fetch(
+      `${SUPABASE_URL}/rest/v1/Productos?cliente_usuario=eq.${encodeURIComponent(usuarioActual)}&select=*&order=id.asc`,
+      { headers }
+    );
+    if(!resp.ok){
+      const errTxt = await resp.text();
+      console.error('Error cargando productos:', errTxt);
+      throw new Error(errTxt);
+    }
+    PRODUCTOS = await resp.json();
+    filtrarYRenderizar();
+  } catch(err){
+    console.error('Error completo cargarProductos:', err);
+    document.getElementById('lista-precios').innerHTML = `<div class="vacio-sec"><div class="vico">⚠️</div>No se pudo conectar. Recargá la página.</div>`;
+  }
+}
+
+async function cargarVentas(){
+  try{
+    const resp = await fetch(
+      `${SUPABASE_URL}/rest/v1/Ventas?cliente_usuario=eq.${encodeURIComponent(usuarioActual)}&select=*&order=fecha.desc`,
+      { headers }
+    );
+    if(!resp.ok) throw new Error('Error HTTP');
+    VENTAS = await resp.json();
+  } catch(err){
+    console.error('Error cargando ventas', err);
+  }
+}
+
+// ═══════════ MÓDULO PRECIOS ═══════════
+function filtrarYRenderizar(){
+  const q = (document.getElementById('buscador').value || '').trim().toLowerCase();
+  const filtrados = PRODUCTOS.filter(p => !q || (p.nombre||'').toLowerCase().includes(q));
+  renderPrecios(filtrados);
+}
+
+function renderPrecios(productos){
+  const cont = document.getElementById('lista-precios');
+
+  if(PRODUCTOS.length === 0){
+    cont.innerHTML = `<div class="vacio-sec"><div class="vico">📦</div>Todavía no cargaste productos<br>Tocá "+ Agregar producto" para empezar</div>`;
+    return;
+  }
+  if(productos.length === 0){
+    cont.innerHTML = `<div class="vacio-sec"><div class="vico">🔍</div>No encontramos ese producto</div>`;
+    return;
+  }
+
+  if(TIPO_CALCULADORA === 'distribuidor'){
+    renderPreciosDistribuidor(productos);
+  } else {
+    renderPreciosSimple(productos);
+  }
+}
+
+// ───── VARIANTE SIMPLE (restaurantes) ─────
+function renderPreciosSimple(productos){
+  const t = gt();
+  let h = '';
+  productos.forEach(p => {
+    const usd = parseFloat(p.precio_usd) || 0;
+    const gan = parseFloat(p.porcentaje_ganancia) || 30;
+    h += `<div class="pcard" id="pcard-${p.id}">
+      <div class="pc-head">
+        <div class="pc-title">
+          <div class="pc-nombre">${esc(p.nombre)}</div>
+          ${p.descripcion ? `<div class="pc-desc">${esc(p.descripcion)}</div>` : ''}
+        </div>
+        <div class="pc-usd-box"><span class="pc-usd-s">$</span>
+          <input class="pc-usd-inp" type="number" value="${usd}" data-id="${p.id}" onchange="cambiarPrecio(this)" step="0.01" inputmode="decimal">
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-vals">
+          <div class="ptasa pb"><div class="ptasa-lbl"><span class="ptasa-dot"></span>BCV</div><div class="ptasa-val bv-${p.id}">${fbs(usd,t.b)}</div></div>
+          <div class="ptasa pn"><div class="ptasa-lbl"><span class="ptasa-dot"></span>BINANCE</div><div class="ptasa-val nv-${p.id}">${fbs(usd,t.n)}</div></div>
+        </div>
+        <div class="pc-gan-box">
+          <span class="pc-gan-lbl">% Ganancia</span>
+          <input class="pc-gan-inp" type="number" value="${gan}" data-id="${p.id}" onchange="cambiarGanancia(this)" min="0" step="1" inputmode="numeric">
+          <span class="pc-gan-pct">%</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('lista-precios').innerHTML = h;
+}
+
+// ───── VARIANTE DISTRIBUIDOR (IVA + caja + semáforos) ─────
+function renderPreciosDistribuidor(productos){
+  const t = gt();
+  let h = '';
+  productos.forEach((p, idx) => {
+    const usd = parseFloat(p.precio_usd) || 0;
+    const gan = parseFloat(p.porcentaje_ganancia) || 30;
+    const uxc = parseFloat(p.unidades_caja) || 1;
+    const baseBs = parseFloat(p.precio_base_bs) || 0;
+    const totalBs = parseFloat(p.precio_total_bs) || 0;
+
+    const ventaUSD = usd * (1 + gan/100);
+    const ventaUnidUSD = ventaUSD / uxc;
+    const compraBCV = usd * t.b;
+    const compraBNC = usd * t.n;
+
+    h += `<div class="pcard-dist" id="pcard-${p.id}">
+      <div class="pcd-head">
+        <div class="pcd-num">${idx+1}</div>
+        <div class="pcd-title">
+          <div class="pcd-nombre">${esc(p.nombre)}</div>
+          ${p.descripcion ? `<div class="pcd-desc">${esc(p.descripcion)}</div>` : ''}
+        </div>
+        <div class="pc-usd-box"><span class="pc-usd-s">$</span>
+          <input class="pc-usd-inp" type="number" value="${usd}" data-id="${p.id}" onchange="cambiarPrecio(this)" step="0.01" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="pcd-dist-box">
+        <div class="pcd-dist-titulo">Precio distribuidor</div>
+        <div class="pcd-dist-fila">
+          <div><div class="pcd-dist-lbl">Base s/IVA</div>
+            <input class="pcd-dist-inp base" type="number" value="${baseBs}" data-id="${p.id}" onchange="cambiarBaseBs(this)" step="0.01" inputmode="decimal">
+          </div>
+          <div><div class="pcd-dist-lbl">Total c/IVA</div>
+            <input class="pcd-dist-inp total" type="number" value="${totalBs}" data-id="${p.id}" onchange="cambiarTotalBs(this)" step="0.01" inputmode="decimal">
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-vals">
+        <div class="ptasa pb"><div class="ptasa-lbl"><span class="ptasa-dot"></span>Compra BCV</div><div class="ptasa-val cbcv-${p.id}">${fbs(usd,t.b)}</div></div>
+        <div class="ptasa pn"><div class="ptasa-lbl"><span class="ptasa-dot"></span>Compra Binance</div><div class="ptasa-val cbnc-${p.id}">${fbs(usd,t.n)}</div></div>
+      </div>
+
+      <div class="pcd-venta-box">
+        <div class="pcd-venta-titulo">Precio sugerido de venta
+          <span class="pc-gan-box"><span class="pc-gan-lbl">%</span>
+            <input class="pc-gan-inp" type="number" value="${gan}" data-id="${p.id}" onchange="cambiarGanancia(this)" min="0" step="1" inputmode="numeric">
+          </span>
+        </div>
+        <div class="pcd-venta-grid">
+          <div><div class="pcd-venta-lbl">En dólares</div><div class="pcd-venta-val usd vusd-${p.id}">${fd(ventaUSD)}</div></div>
+          <div><div class="pcd-venta-lbl">Bs. BCV</div><div class="pcd-venta-val vbcv-${p.id}">${fbs(ventaUSD,t.b)}</div></div>
+          <div><div class="pcd-venta-lbl">Bs. Binance</div><div class="pcd-venta-val vbnc-${p.id}">${fbs(ventaUSD,t.n)}</div></div>
+          <div><div class="pcd-venta-lbl">Ganancia $</div><div class="pcd-venta-val verde vgan-${p.id}">${fd(ventaUSD-usd)}</div></div>
+        </div>
+      </div>
+
+      <div class="pcd-unidad-box">
+        <div class="pcd-unidad-top">
+          <div class="pcd-unidad-titulo">Precio sugerido por unidad</div>
+          <span class="pcd-uxc-box"><span class="pcd-uxc-lbl">und/caja</span>
+            <input class="pcd-uxc-inp" type="number" value="${uxc}" data-id="${p.id}" onchange="cambiarUxc(this)" min="1" step="1" inputmode="numeric">
+          </span>
+        </div>
+        <div class="pcd-venta-grid">
+          <div><div class="pcd-venta-lbl">Por unidad $</div><div class="pcd-venta-val usd puusd-${p.id}">${fd(ventaUnidUSD)}</div></div>
+          <div><div class="pcd-venta-lbl">Bs. BCV</div><div class="pcd-venta-val pubcv-${p.id}">${fbs(ventaUnidUSD,t.b)}</div></div>
+          <div><div class="pcd-venta-lbl">Bs. Binance</div><div class="pcd-venta-val pubnc-${p.id}">${fbs(ventaUnidUSD,t.n)}</div></div>
+        </div>
+      </div>
+
+      <div class="pcd-semaforos">
+        <div class="sem-item"><div class="sem-lbl">Rotación</div><div class="sem-dot ${dotClassFor(p.rotacion)}"></div></div>
+        <div class="sem-item"><div class="sem-lbl">Rentabilidad</div><div class="sem-dot ${dotClassFor(p.rentabilidad)}"></div></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('lista-precios').innerHTML = h;
+}
+
+function dotClassFor(color){
+  if(color === 'verde') return 'dot-verde';
+  if(color === 'rojo') return 'dot-rojo';
+  return 'dot-amarillo';
+}
+
+function upd(){
+  const t = gt();
+  if(TIPO_CALCULADORA === 'distribuidor'){
+    PRODUCTOS.forEach(p => actualizarCardDistribuidor(p.id));
+  } else {
+    PRODUCTOS.forEach(p => {
+      const usd = parseFloat(p.precio_usd) || 0;
+      const bv = document.querySelector('.bv-' + p.id);
+      const nv = document.querySelector('.nv-' + p.id);
+      if(bv) bv.textContent = fbs(usd, t.b);
+      if(nv) nv.textContent = fbs(usd, t.n);
+    });
+  }
+}
+
+function actualizarCardDistribuidor(id){
+  const p = PRODUCTOS.find(x => x.id == id);
+  if(!p) return;
+  const t = gt();
+  const usd = parseFloat(p.precio_usd) || 0;
+  const gan = parseFloat(p.porcentaje_ganancia) || 30;
+  const uxc = parseFloat(p.unidades_caja) || 1;
+  const ventaUSD = usd * (1 + gan/100);
+  const ventaUnidUSD = ventaUSD / uxc;
+
+  const setTxt = (sel, val) => { const el = document.querySelector(sel); if(el) el.textContent = val; };
+  setTxt('.cbcv-' + id, fbs(usd, t.b));
+  setTxt('.cbnc-' + id, fbs(usd, t.n));
+  setTxt('.vusd-' + id, fd(ventaUSD));
+  setTxt('.vbcv-' + id, fbs(ventaUSD, t.b));
+  setTxt('.vbnc-' + id, fbs(ventaUSD, t.n));
+  setTxt('.vgan-' + id, fd(ventaUSD - usd));
+  setTxt('.puusd-' + id, fd(ventaUnidUSD));
+  setTxt('.pubcv-' + id, fbs(ventaUnidUSD, t.b));
+  setTxt('.pubnc-' + id, fbs(ventaUnidUSD, t.n));
+}
+
+async function cambiarPrecio(el){
+  const id = el.getAttribute('data-id');
+  const nuevoPrecio = parseFloat(el.value) || 0;
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(prod) prod.precio_usd = nuevoPrecio;
+
+  if(TIPO_CALCULADORA === 'distribuidor'){
+    actualizarCardDistribuidor(id);
+  } else {
+    const t = gt();
+    document.querySelector('.bv-' + id).textContent = fbs(nuevoPrecio, t.b);
+    document.querySelector('.nv-' + id).textContent = fbs(nuevoPrecio, t.n);
+  }
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ precio_usd: nuevoPrecio })
+    });
+  } catch(err){ toast('No se pudo guardar el cambio', true); }
+}
+
+async function cambiarGanancia(el){
+  const id = el.getAttribute('data-id');
+  const nuevaGan = parseFloat(el.value) || 0;
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(prod) prod.porcentaje_ganancia = nuevaGan;
+  if(TIPO_CALCULADORA === 'distribuidor') actualizarCardDistribuidor(id);
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ porcentaje_ganancia: nuevaGan })
+    });
+  } catch(err){ toast('No se pudo guardar el cambio', true); }
+}
+
+async function cambiarUxc(el){
+  const id = el.getAttribute('data-id');
+  const nuevoUxc = parseFloat(el.value) || 1;
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(prod) prod.unidades_caja = nuevoUxc;
+  actualizarCardDistribuidor(id);
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ unidades_caja: nuevoUxc })
+    });
+  } catch(err){ toast('No se pudo guardar el cambio', true); }
+}
+
+async function cambiarBaseBs(el){
+  const id = el.getAttribute('data-id');
+  const nuevoVal = parseFloat(el.value) || 0;
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(prod) prod.precio_base_bs = nuevoVal;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ precio_base_bs: nuevoVal })
+    });
+  } catch(err){ toast('No se pudo guardar el cambio', true); }
+}
+
+async function cambiarTotalBs(el){
+  const id = el.getAttribute('data-id');
+  const nuevoVal = parseFloat(el.value) || 0;
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(prod) prod.precio_total_bs = nuevoVal;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ precio_total_bs: nuevoVal })
+    });
+  } catch(err){ toast('No se pudo guardar el cambio', true); }
+}
+
+// ═══════════ MÓDULO INVENTARIO ═══════════
+function renderInventario(){
+  const q = (document.getElementById('buscador-inv').value || '').trim().toLowerCase();
+  let h = '', bajo = 0, totalUnid = 0;
+
+  PRODUCTOS.forEach(p => {
+    const stock = parseFloat(p.stock) || 0;
+    const stockMin = parseFloat(p.stock_minimo) || 5;
+    totalUnid += stock;
+    const esBajo = stock <= stockMin;
+    if(esBajo) bajo++;
+
+    if(q && !(p.nombre||'').toLowerCase().includes(q)) return;
+
+    h += `<div class="invp-card${esBajo?' bajo':''}" id="invcard-${p.id}">
+      <div class="invp-top">
+        <div class="invp-info"><div class="invp-nombre">${esc(p.nombre)}</div></div>
+        <div class="invp-stock-box">
+          <input class="invp-stock-num" type="number" value="${stock}" data-id="${p.id}" oninput="editarStock(this)" inputmode="numeric">
+          <div class="invp-stock-lbl">en stock</div>
+        </div>
+      </div>
+      <div class="invp-actions">
+        <button class="btn-venta-rapida" onclick="venderUnidad(${p.id})">− 1 vendida</button>
+        <div class="invp-cant-box">
+          <input class="invp-cant-inp" type="number" id="cantvender-${p.id}" placeholder="Cant." min="1" inputmode="numeric">
+          <button class="btn-vender-cant" onclick="venderCantidad(${p.id})">Vender</button>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('lista-inventario').innerHTML = h || `<div class="vacio-sec"><div class="vico">📦</div>Sin productos que coincidan</div>`;
+  document.getElementById('inv-bajo').textContent = bajo;
+  document.getElementById('inv-total').textContent = PRODUCTOS.length;
+  document.getElementById('inv-unidades').textContent = totalUnid;
+}
+
+async function editarStock(el){
+  const id = el.getAttribute('data-id');
+  const nuevoStock = parseFloat(el.value) || 0;
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(prod) prod.stock = nuevoStock;
+
+  const card = document.getElementById('invcard-' + id);
+  if(card){
+    const stockMin = parseFloat(prod.stock_minimo) || 5;
+    card.classList.toggle('bajo', nuevoStock <= stockMin);
+  }
+
+  let bajo = 0, totalUnid = 0;
+  PRODUCTOS.forEach(p => {
+    const s = parseFloat(p.stock) || 0;
+    const m = parseFloat(p.stock_minimo) || 5;
+    totalUnid += s;
+    if(s <= m) bajo++;
+  });
+  document.getElementById('inv-bajo').textContent = bajo;
+  document.getElementById('inv-unidades').textContent = totalUnid;
+
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ stock: nuevoStock })
+    });
+  } catch(err){ toast('No se pudo guardar el stock', true); }
+}
+
+async function registrarVenta(id, cant){
+  const prod = PRODUCTOS.find(p => p.id == id);
+  if(!prod) return;
+  const stockActual = parseFloat(prod.stock) || 0;
+  if(cant <= 0) return;
+  if(cant > stockActual){
+    if(!confirm(`Solo quedan ${stockActual} unidades. ¿Vender de todas formas?`)) return;
+  }
+
+  const nuevoStock = Math.max(0, stockActual - cant);
+  prod.stock = nuevoStock;
+
+  const usd = parseFloat(prod.precio_usd) || 0;
+  const uxc = parseFloat(prod.unidades_caja) || 1;
+  const gan = parseFloat(prod.porcentaje_ganancia) || 30;
+  const ventaUnidUSD = (usd * (1 + gan/100)) / uxc;
+  const montoTotal = ventaUnidUSD * cant;
+  const gananciaTotal = (ventaUnidUSD - (usd/uxc)) * cant;
+
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ stock: nuevoStock })
+    });
+    await fetch(`${SUPABASE_URL}/rest/v1/Ventas`, {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        cliente_usuario: usuarioActual,
+        producto_id: id,
+        producto_nombre: prod.nombre,
+        cantidad: cant,
+        monto_usd: montoTotal,
+        ganancia_usd: gananciaTotal,
+        fecha: new Date().toISOString()
+      })
+    });
+    await cargarVentas();
+    renderInventario();
+    toast(`${cant} unidad${cant>1?'es':''} de "${prod.nombre}" registrada${cant>1?'s':''}`);
+  } catch(err){
+    toast('No se pudo registrar la venta', true);
+  }
+}
+
+function venderUnidad(id){ registrarVenta(id, 1); }
+function venderCantidad(id){
+  const inp = document.getElementById('cantvender-' + id);
+  const cant = parseInt(inp.value) || 0;
+  if(cant <= 0){ inp.focus(); return; }
+  registrarVenta(id, cant);
+  inp.value = '';
+}
+
+// ═══════════ MÓDULO ANALÍTICA ═══════════
+function cambiarPeriodo(per){
+  periodoActual = per;
+  document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('per-'+per).classList.add('on');
+  renderAnalitica();
+}
+
+function msPeriodo(per){
+  const dia = 24*60*60*1000;
+  if(per === 'semana') return 7*dia;
+  if(per === 'quincena') return 15*dia;
+  if(per === 'mes') return 30*dia;
+  return 7*dia;
+}
+
+function renderAnalitica(){
+  const rango = msPeriodo(periodoActual);
+  const ahora = Date.now();
+  const ventasPeriodo = VENTAS.filter(v => (ahora - new Date(v.fecha).getTime()) <= rango);
+
+  let totalUnidades = 0, totalUtilidad = 0;
+  const porProducto = {};
+
+  ventasPeriodo.forEach(v => {
+    totalUnidades += parseFloat(v.cantidad) || 0;
+    totalUtilidad += parseFloat(v.ganancia_usd) || 0;
+    const key = v.producto_id;
+    if(!porProducto[key]) porProducto[key] = { nombre: v.producto_nombre, cant: 0, monto: 0 };
+    porProducto[key].cant += parseFloat(v.cantidad) || 0;
+    porProducto[key].monto += parseFloat(v.monto_usd) || 0;
+  });
+
+  document.getElementById('an-unidades').textContent = totalUnidades;
+  document.getElementById('an-utilidad').textContent = fd(totalUtilidad);
+  const txtPeriodo = periodoActual === 'semana' ? 'Esta semana' : periodoActual === 'quincena' ? 'Esta quincena' : 'Este mes';
+  document.getElementById('an-periodo-txt').textContent = txtPeriodo;
+
+  const top = Object.values(porProducto).sort((a,b) => b.cant - a.cant).slice(0, 5);
+  let ht = '';
+  if(top.length === 0){
+    ht = `<div class="vacio-sec"><div class="vico">📊</div>Aún no hay ventas registradas<br>en este período</div>`;
+  } else {
+    top.forEach((t, idx) => {
+      ht += `<div class="top-card">
+        <div class="top-pos">#${idx+1}</div>
+        <div class="top-info"><div class="top-nombre">${esc(t.nombre)}</div><div class="top-det">${fd(t.monto)} generados</div></div>
+        <div class="top-num"><div class="top-cant">${t.cant}</div><div class="top-cant-lbl">unidades</div></div>
+      </div>`;
+    });
+  }
+  document.getElementById('lista-top').innerHTML = ht;
+
+  let hh = '';
+  const historialOrdenado = ventasPeriodo.slice().sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+  if(historialOrdenado.length === 0){
+    hh = `<div class="vacio-sec"><div class="vico">🧾</div>Sin movimientos en este período</div>`;
+  } else {
+    historialOrdenado.forEach(v => {
+      const f = new Date(v.fecha);
+      const fStr = f.getHours()+':'+(f.getMinutes()<10?'0':'')+f.getMinutes()+' · '+f.getDate()+'/'+(f.getMonth()+1);
+      hh += `<div class="hist-item">
+        <div class="hist-ico">🛒</div>
+        <div class="hist-info"><div class="hist-nombre">${esc(v.producto_nombre)} ×${v.cantidad}</div><div class="hist-meta">${fStr}</div></div>
+        <div class="hist-monto">${fd(v.monto_usd)}</div>
+      </div>`;
+    });
+  }
+  document.getElementById('lista-historial').innerHTML = hh;
+}
+
+// ═══════════ NUEVO PRODUCTO ═══════════
+function abrirModalNuevo(){
+  document.getElementById('modal-nuevo').classList.add('abierto');
+  document.getElementById('np-dist-row').style.display = (TIPO_CALCULADORA === 'distribuidor') ? 'grid' : 'none';
+}
+function cerrarModal(){
+  document.getElementById('modal-nuevo').classList.remove('abierto');
+  ['np-nombre','np-desc','np-usd','np-stock','np-min','np-base-bs','np-total-bs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('np-uxc').value = 1;
+  document.getElementById('np-gan').value = 30;
+}
+
+async function guardarProducto(){
+  const nombre = document.getElementById('np-nombre').value.trim();
+  const desc = document.getElementById('np-desc').value.trim();
+  const usd = parseFloat(document.getElementById('np-usd').value) || 0;
+  const stock = parseFloat(document.getElementById('np-stock').value) || 0;
+  const uxc = parseFloat(document.getElementById('np-uxc').value) || 1;
+  const gan = parseFloat(document.getElementById('np-gan').value) || 30;
+  const min = parseFloat(document.getElementById('np-min').value) || 5;
+
+  const elBase = document.getElementById('np-base-bs');
+  const elTotal = document.getElementById('np-total-bs');
+  const baseBs = elBase ? (parseFloat(elBase.value) || 0) : 0;
+  const totalBs = elTotal ? (parseFloat(elTotal.value) || 0) : 0;
+
+  if(!nombre || !usd){ toast('Completá nombre y precio', true); return; }
+
+  const payload = {
+    cliente_usuario: usuarioActual,
+    nombre, descripcion: desc,
+    precio_usd: usd, stock: stock,
+    unidades_caja: uxc, porcentaje_ganancia: gan,
+    stock_minimo: min
+  };
+  if(TIPO_CALCULADORA === 'distribuidor'){
+    payload.precio_base_bs = baseBs;
+    payload.precio_total_bs = totalBs;
+  }
+
+  try{
+    let resp = await fetch(`${SUPABASE_URL}/rest/v1/Productos`, {
+      method: 'POST', headers,
+      body: JSON.stringify(payload)
+    });
+
+    if(!resp.ok){
+      const errTxt = await resp.text();
+      console.error('Supabase error (intento 1):', errTxt);
+
+      // Si el error es por columnas que no existen, reintentar sin los campos distribuidor
+      if(errTxt.includes('precio_base_bs') || errTxt.includes('precio_total_bs') || errTxt.includes('column')){
+        const payloadBasico = { ...payload };
+        delete payloadBasico.precio_base_bs;
+        delete payloadBasico.precio_total_bs;
+
+        resp = await fetch(`${SUPABASE_URL}/rest/v1/Productos`, {
+          method: 'POST', headers,
+          body: JSON.stringify(payloadBasico)
+        });
+
+        if(!resp.ok){
+          const errTxt2 = await resp.text();
+          console.error('Supabase error (intento 2):', errTxt2);
+          throw new Error(errTxt2);
+        }
+        toast(`"${nombre}" agregado (sin campos de IVA — revisá la tabla productos)`, true);
+        cerrarModal();
+        await cargarProductos();
+        return;
+      }
+      throw new Error(errTxt);
+    }
+
+    toast(`"${nombre}" agregado`);
+    cerrarModal();
+    await cargarProductos();
+  } catch(err){
+    console.error('Error completo:', err);
+    toast('Error al guardar. Revisá la consola (F12).', true);
+  }
+}
+
+// ═══════════ INIT ═══════════
+async function init(){
+  await cargarProductos();
+  await cargarVentas();
+}
+init();
+</script>
+</body>
+</html>
