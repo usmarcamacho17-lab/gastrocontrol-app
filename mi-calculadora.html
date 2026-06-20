@@ -480,7 +480,7 @@ function irTab(tab){
 async function cargarProductos(){
   try{
     const resp = await fetch(
-      `${SUPABASE_URL}/rest/v1/productos?cliente_usuario=eq.${encodeURIComponent(usuarioActual)}&select=*&order=id.asc`,
+      `${SUPABASE_URL}/rest/v1/Productos?cliente_usuario=eq.${encodeURIComponent(usuarioActual)}&select=*&order=id.asc`,
       { headers }
     );
     if(!resp.ok){
@@ -499,7 +499,7 @@ async function cargarProductos(){
 async function cargarVentas(){
   try{
     const resp = await fetch(
-      `${SUPABASE_URL}/rest/v1/ventas?cliente_usuario=eq.${encodeURIComponent(usuarioActual)}&select=*&order=fecha.desc`,
+      `${SUPABASE_URL}/rest/v1/Ventas?cliente_usuario=eq.${encodeURIComponent(usuarioActual)}&select=*&order=fecha.desc`,
       { headers }
     );
     if(!resp.ok) throw new Error('Error HTTP');
@@ -707,7 +707,7 @@ async function cambiarPrecio(el){
     document.querySelector('.nv-' + id).textContent = fbs(nuevoPrecio, t.n);
   }
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ precio_usd: nuevoPrecio })
     });
   } catch(err){ toast('No se pudo guardar el cambio', true); }
@@ -720,7 +720,7 @@ async function cambiarGanancia(el){
   if(prod) prod.porcentaje_ganancia = nuevaGan;
   if(TIPO_CALCULADORA === 'distribuidor') actualizarCardDistribuidor(id);
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ porcentaje_ganancia: nuevaGan })
     });
   } catch(err){ toast('No se pudo guardar el cambio', true); }
@@ -733,7 +733,7 @@ async function cambiarUxc(el){
   if(prod) prod.unidades_caja = nuevoUxc;
   actualizarCardDistribuidor(id);
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ unidades_caja: nuevoUxc })
     });
   } catch(err){ toast('No se pudo guardar el cambio', true); }
@@ -745,7 +745,7 @@ async function cambiarBaseBs(el){
   const prod = PRODUCTOS.find(p => p.id == id);
   if(prod) prod.precio_base_bs = nuevoVal;
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ precio_base_bs: nuevoVal })
     });
   } catch(err){ toast('No se pudo guardar el cambio', true); }
@@ -757,7 +757,7 @@ async function cambiarTotalBs(el){
   const prod = PRODUCTOS.find(p => p.id == id);
   if(prod) prod.precio_total_bs = nuevoVal;
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ precio_total_bs: nuevoVal })
     });
   } catch(err){ toast('No se pudo guardar el cambio', true); }
@@ -824,7 +824,7 @@ async function editarStock(el){
   document.getElementById('inv-unidades').textContent = totalUnid;
 
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ stock: nuevoStock })
     });
   } catch(err){ toast('No se pudo guardar el stock', true); }
@@ -850,10 +850,10 @@ async function registrarVenta(id, cant){
   const gananciaTotal = (ventaUnidUSD - (usd/uxc)) * cant;
 
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Productos?id=eq.${id}`, {
       method: 'PATCH', headers, body: JSON.stringify({ stock: nuevoStock })
     });
-    await fetch(`${SUPABASE_URL}/rest/v1/ventas`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/Ventas`, {
       method: 'POST', headers,
       body: JSON.stringify({
         cliente_usuario: usuarioActual,
@@ -994,7 +994,7 @@ async function guardarProducto(){
   }
 
   try{
-    let resp = await fetch(`${SUPABASE_URL}/rest/v1/productos`, {
+    let resp = await fetch(`${SUPABASE_URL}/rest/v1/Productos`, {
       method: 'POST', headers,
       body: JSON.stringify(payload)
     });
@@ -1009,7 +1009,7 @@ async function guardarProducto(){
         delete payloadBasico.precio_base_bs;
         delete payloadBasico.precio_total_bs;
 
-        resp = await fetch(`${SUPABASE_URL}/rest/v1/productos`, {
+        resp = await fetch(`${SUPABASE_URL}/rest/v1/Productos`, {
           method: 'POST', headers,
           body: JSON.stringify(payloadBasico)
         });
