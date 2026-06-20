@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A0500'/%3E%3Crect x='3' y='3' width='94' height='94' rx='19' fill='none' stroke='%23C9A84C' stroke-width='4'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='58' font-weight='700' fill='%23C9A84C' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E">
+<title>GastroControl — Panel Admin</title>
+<style>
+html, body { margin:0; padding:0; width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
+* { box-sizing:border-box; }
+body {
+  background: #0E0E14;
+  color: #E8E8F0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(160deg, #14141C 0%, #1A0F30 100%);
+  border-bottom: 1px solid #C9A84C33;
+  padding: 16px 16px 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hd-logo {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: #0A0500; border: 2px solid #C9A84C;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.hd-text { flex: 1; }
+.hd-name { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 0.5px; line-height: 1; }
+.hd-sub  { font-size: 10px; color: #C9A84C; letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
+.hd-badge {
+  background: #27AE60; color: #000; font-size: 9px; font-weight: 900;
+  padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase;
+}
+.hd-badge.offline { background: #E74C3C; color: #fff; }
+
+/* RESUMEN GRID */
+.resumen {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 14px;
+}
+.rcard {
+  background: #16121F; border: 1px solid #1E1A2E;
+  border-radius: 14px; padding: 13px 13px 11px;
+}
+.rcard.verde { border-top: 2.5px solid #27AE60; }
+.rcard.oro   { border-top: 2.5px solid #C9A84C; }
+.rcard.rojo  { border-top: 2.5px solid #E74C3C; }
+.rcard.azul  { border-top: 2.5px solid #3498DB; }
+.r-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.3px; color: #5A4A7A; margin-bottom: 5px; }
+.r-val { font-size: 22px; font-weight: 900; line-height: 1; }
+.rcard.verde .r-val { color: #27AE60; }
+.rcard.oro   .r-val { color: #C9A84C; }
+.rcard.rojo  .r-val { color: #E74C3C; }
+.rcard.azul  .r-val { color: #3498DB; }
+.r-sub { font-size: 9px; color: #3A2D5A; margin-top: 3px; }
+
+/* TOOLBAR */
+.toolbar { padding: 0 14px 12px; }
+.search-box {
+  background: #16121F; border: 1.5px solid #1E1A2E; border-radius: 12px;
+  padding: 10px 14px; display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.search-ico { font-size: 14px; color: #4A3D6A; }
+.search-inp {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: #E8E8F0; font-size: 13px;
+}
+.search-inp::placeholder { color: #3A2D5A; }
+
+.stitle {
+  font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  color: #C9A84C; margin: 6px 14px 10px;
+}
+
+/* LISTA CLIENTES */
+.lista { padding: 0 14px; display: flex; flex-direction: column; gap: 10px; }
+
+.ccard {
+  background: #16121F; border: 1px solid #1E1A2E;
+  border-radius: 16px; padding: 14px; overflow: hidden;
+  border-left: 3px solid #4A3D6A;
+}
+.ccard.activo    { border-left-color: #27AE60; }
+.ccard.gracia    { border-left-color: #F0B429; }
+.ccard.bloqueado { border-left-color: #E74C3C; }
+
+.ccard-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ccard-avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: #1E1A2E; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.ccard-info { flex: 1; min-width: 0; }
+.ccard-nombre { font-size: 14px; font-weight: 800; color: #fff; }
+.ccard-plan { font-size: 10px; color: #5A4A7A; margin-top: 1px; }
+
+.estado-pill {
+  font-size: 9px; font-weight: 800; padding: 4px 10px;
+  border-radius: 20px; letter-spacing: 0.5px; flex-shrink: 0;
+  text-transform: uppercase; white-space: nowrap;
+}
+.estado-activo    { background: #27AE6022; color: #27AE60; border: 1px solid #27AE6044; }
+.estado-gracia    { background: #F0B42922; color: #F0B429; border: 1px solid #F0B42944; }
+.estado-bloqueado { background: #E74C3C22; color: #E74C3C; border: 1px solid #E74C3C44; }
+
+.ccard-det {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 11px;
+}
+.det-box { background: #0E0B18; border-radius: 9px; padding: 8px 10px; }
+.det-lbl { font-size: 8px; color: #3A2D5A; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+.det-val { font-size: 13px; font-weight: 800; color: #C9C0D8; }
+
+.tipo-calc-wrap {
+  background: #0E0B18; border: 1px solid #1E1A2E;
+  border-radius: 10px; padding: 9px 11px; margin-bottom: 11px;
+}
+.tipo-calc-lbl {
+  font-size: 8px; color: #3A2D5A; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+}
+.tipo-calc-sel {
+  width: 100%; background: #16121F; border: 1.5px solid #2E2548;
+  border-radius: 8px; color: #C9C0D8; font-size: 12px; font-weight: 700;
+  padding: 8px 10px; outline: none; cursor: pointer;
+}
+.tipo-calc-sel:focus { border-color: #C9A84C; }
+
+.ccard-actions { display: flex; gap: 8px; }
+.btn-pagado {
+  flex: 1; background: #27AE60; color: #fff; border: none;
+  border-radius: 10px; padding: 9px; font-size: 12px; font-weight: 800;
+  cursor: pointer;
+}
+.btn-bloquear {
+  background: #E74C3C22; color: #E74C3C; border: 1px solid #E74C3C44;
+  border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 700;
+  cursor: pointer;
+}
+.btn-activar {
+  background: #27AE6022; color: #27AE60; border: 1px solid #27AE6044;
+  border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* BOTON NUEVO */
+.btn-nuevo {
+  margin: 16px 14px 0; width: calc(100% - 28px);
+  background: linear-gradient(135deg, #C9A84C, #A8883C);
+  color: #000; border: none; border-radius: 14px;
+  padding: 14px; font-size: 14px; font-weight: 800;
+  cursor: pointer; letter-spacing: 0.3px;
+}
+
+/* VACIO / LOADING / ERROR */
+.estado-msg {
+  text-align: center; padding: 40px 20px; color: #3A2D5A;
+}
+.estado-msg .ico { font-size: 36px; margin-bottom: 10px; }
+.estado-msg .txt { font-size: 13px; font-weight: 600; }
+.estado-msg .sub { font-size: 11px; color: #2A2040; margin-top: 6px; }
+
+/* MODAL */
+.modal-fondo {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.88); z-index: 9999;
+  align-items: flex-end;
+}
+.modal-fondo.abierto { display: flex; }
+.modal-caja {
+  background: #16121F; width: 100%;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 18px 36px;
+  max-height: 90vh; overflow-y: auto;
+  border-top: 1.5px solid #C9A84C44;
+}
+.modal-tit {
+  font-size: 17px; font-weight: 900; color: #fff;
+  margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-x {
+  background: #1E1A2E; border: none; border-radius: 50%;
+  width: 32px; height: 32px; color: #5A4A7A;
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.campo {
+  width: 100%; background: #0E0B18; border: 1.5px solid #1E1A2E;
+  border-radius: 12px; color: #E8E8F0; font-size: 14px;
+  padding: 12px 13px; outline: none;
+}
+.campo:focus { border-color: #C9A84C; }
+.campo::placeholder { color: #2A2040; }
+.campo-lbl { font-size: 11px; color: #5A4A7A; font-weight: 600; margin-bottom: 5px; }
+.campo-wrap { margin-bottom: 12px; }
+.campo-doble { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.boton-modal {
+  width: 100%; background: #C9A84C; color: #000; border: none;
+  border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 800;
+  cursor: pointer; margin-top: 4px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #27AE60; color: #fff; padding: 10px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; z-index: 10000;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+  max-width: 88%; text-align: center;
+}
+.toast.vis { opacity: 1; }
+.toast.err { background: #E74C3C; }
+
+/* FOOTER */
+.footer { margin: 28px 14px 0; border-top: 1px solid #1E1A2E; padding-top: 16px; text-align: center; }
+.footer-brand { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #C9A84C; font-weight: 800; }
+.footer-tag { font-size: 10px; color: #2A2040; margin-top: 4px; }
+
+/* CANDADO DE ACCESO ADMIN */
+#candado-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0E0E14;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#candado-overlay.oculto { display: none; }
+.candado-card {
+  width: 100%; max-width: 360px;
+  background: #16121F; border: 1.5px solid #1E1A2E;
+  border-radius: 24px; padding: 32px 26px;
+}
+.candado-logo {
+  width: 60px; height: 60px; border-radius: 16px;
+  background: #0A0500; border: 2px solid #C9A84C;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin: 0 auto 16px;
+}
+.candado-tit { text-align: center; font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+.candado-sub { text-align: center; font-size: 11px; color: #C9A84C; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; }
+.candado-inp {
+  width: 100%; background: #0E0B18; border: 1.5px solid #1E1A2E;
+  border-radius: 12px; color: #E8E8F0; font-size: 16px;
+  padding: 14px 15px; outline: none; text-align: center;
+  letter-spacing: 4px; margin-bottom: 14px;
+}
+.candado-inp:focus { border-color: #C9A84C; }
+.candado-btn {
+  width: 100%; background: linear-gradient(135deg, #C9A84C, #A8883C);
+  color: #000; border: none; border-radius: 14px;
+  padding: 14px; font-size: 14px; font-weight: 800; cursor: pointer;
+}
+.candado-error {
+  display: none; text-align: center; font-size: 11px; color: #FF8A7A;
+  margin-bottom: 12px;
+}
+.candado-error.vis { display: block; }
+</style>
+</head>
+<body>
+
+<!-- CANDADO DE ACCESO -->
+<div id="candado-overlay">
+  <div class="candado-card">
+    <div class="candado-logo">🔒</div>
+    <div class="candado-tit">Acceso Restringido</div>
+    <div class="candado-sub">Panel de administrador</div>
+    <div class="candado-error" id="candado-error">Clave incorrecta</div>
+    <input type="password" class="candado-inp" id="candado-clave" placeholder="••••••" inputmode="numeric" autocomplete="off">
+    <button class="candado-btn" onclick="verificarClaveAdmin()">Entrar</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="hd-logo">⚙️</div>
+  <div class="hd-text">
+    <div class="hd-name">GastroControl</div>
+    <div class="hd-sub">Panel de Membresías</div>
+  </div>
+  <div class="hd-badge" id="estado-conexion">Conectando...</div>
+</div>
+
+<div class="resumen">
+  <div class="rcard verde">
+    <div class="r-lbl">Clientes Activos</div>
+    <div class="r-val" id="r-activos">—</div>
+    <div class="r-sub">Al día con el pago</div>
+  </div>
+  <div class="rcard oro">
+    <div class="r-lbl">Total clientes</div>
+    <div class="r-val" id="r-total">—</div>
+    <div class="r-sub">Registrados en el sistema</div>
+  </div>
+  <div class="rcard rojo">
+    <div class="r-lbl">En gracia</div>
+    <div class="r-val" id="r-gracia">—</div>
+    <div class="r-sub">Por vencer pronto</div>
+  </div>
+  <div class="rcard azul">
+    <div class="r-lbl">Bloqueados</div>
+    <div class="r-val" id="r-bloqueados">—</div>
+    <div class="r-sub">Sin acceso actualmente</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <span class="search-ico">🔍</span>
+    <input class="search-inp" id="buscador" placeholder="Buscar cliente o negocio..." oninput="filtrarYRenderizar()">
+  </div>
+</div>
+
+<div class="stitle">Clientes</div>
+
+<div class="lista" id="lista-clientes">
+  <div class="estado-msg">
+    <div class="ico">⏳</div>
+    <div class="txt">Cargando clientes...</div>
+  </div>
+</div>
+
+<button class="btn-nuevo" onclick="abrirModalNuevo()">+ Agregar nuevo cliente</button>
+
+<div class="footer">
+  <div class="footer-brand">GastroControl</div>
+  <div class="footer-tag">Panel interno · Solo administradores</div>
+</div>
+
+<!-- MODAL NUEVO CLIENTE -->
+<div class="modal-fondo" id="modal-nuevo">
+  <div class="modal-caja">
+    <div class="modal-tit">+ Nuevo cliente <button class="modal-x" onclick="cerrarModal()">×</button></div>
+
+    <div class="campo-wrap">
+      <div class="campo-lbl">Nombre del negocio</div>
+      <input class="campo" id="nc-nombre" placeholder="Ej: Acuario RB">
+    </div>
+    <div class="campo-doble">
+      <div>
+        <div class="campo-lbl">Usuario</div>
+        <input class="campo" id="nc-usuario" placeholder="usuario">
+      </div>
+      <div>
+        <div class="campo-lbl">Clave</div>
+        <input class="campo" id="nc-clave" placeholder="clave">
+      </div>
+    </div>
+    <div class="campo-wrap">
+      <div class="campo-lbl">Plan</div>
+      <select class="campo" id="nc-plan">
+        <option value="Basico">Básico — $10/mes</option>
+        <option value="Estandar" selected>Estándar — $20/mes</option>
+        <option value="Full">Full — $30/mes</option>
+      </select>
+    </div>
+    <div class="campo-wrap">
+      <div class="campo-lbl">Fecha del primer pago</div>
+      <input class="campo" id="nc-fecha" type="date">
+    </div>
+
+    <button class="boton-modal" onclick="guardarClienteNuevo()">Guardar cliente</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════ CONFIG SUPABASE ═══════════
+const SUPABASE_URL = 'https://mcknncjahkibnbgogmgb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_fxgangMM5b2DmTp48aXEIg_ei_bhVgx';
+const TABLA = 'Clientes';
+
+const headers = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
+
+let CLIENTES = [];
+
+// ═══════════ UTILS ═══════════
+function toast(msg, esError){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast vis' + (esError ? ' err' : '');
+  setTimeout(() => { t.className = 'toast'; }, 2500);
+}
+
+function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function diasHasta(fechaStr){
+  if(!fechaStr) return null;
+  const hoy = new Date();
+  const venc = new Date(fechaStr);
+  venc.setDate(venc.getDate() + 30); // vence 30 días después del último pago
+  const diff = Math.ceil((venc - hoy) / (1000*60*60*24));
+  return diff;
+}
+
+function calcularEstado(cliente){
+  // Si el campo estado dice explícitamente "bloqueado", respetarlo
+  if(cliente.estado === 'bloqueado') return 'bloqueado';
+
+  const dias = diasHasta(cliente.fecha_ultimo_pago);
+  if(dias === null) return 'activo';
+  if(dias < -5) return 'bloqueado';      // más de 5 días vencido
+  if(dias < 0) return 'gracia';          // vencido pero en período de gracia
+  if(dias <= 3) return 'gracia';         // por vencer en 3 días o menos
+  return 'activo';
+}
+
+function planPrecio(plan){
+  if(plan === 'Basico') return '$10/mes';
+  if(plan === 'Full') return '$30/mes';
+  return '$20/mes';
+}
+
+function avatarParaNombre(nombre){
+  const n = (nombre||'').toLowerCase();
+  if(n.includes('acuario')) return '🐟';
+  if(n.includes('espiro')) return '🌀';
+  if(n.includes('borgo')) return '🍝';
+  if(n.includes('vereda')) return '🥖';
+  return '🍽️';
+}
+
+// ═══════════ CARGAR DATOS DESDE SUPABASE ═══════════
+async function cargarClientes(){
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLA}?select=*&order=id.asc`, { headers });
+    if(!resp.ok) throw new Error('Error HTTP ' + resp.status);
+    CLIENTES = await resp.json();
+    document.getElementById('estado-conexion').textContent = '● Conectado';
+    document.getElementById('estado-conexion').classList.remove('offline');
+    filtrarYRenderizar();
+  } catch(err){
+    console.error(err);
+    document.getElementById('estado-conexion').textContent = '● Sin conexión';
+    document.getElementById('estado-conexion').classList.add('offline');
+    document.getElementById('lista-clientes').innerHTML = `
+      <div class="estado-msg">
+        <div class="ico">⚠️</div>
+        <div class="txt">No se pudo conectar a la base de datos</div>
+        <div class="sub">Revisá tu conexión a internet y recargá la página</div>
+      </div>`;
+  }
+}
+
+// ═══════════ RENDER ═══════════
+function filtrarYRenderizar(){
+  const q = (document.getElementById('buscador').value || '').trim().toLowerCase();
+  const filtrados = CLIENTES.filter(c => !q || (c.nombre_negocio||'').toLowerCase().includes(q));
+  renderResumen();
+  renderLista(filtrados);
+}
+
+function renderResumen(){
+  let activos = 0, gracia = 0, bloqueados = 0;
+  CLIENTES.forEach(c => {
+    const est = calcularEstado(c);
+    if(est === 'activo') activos++;
+    else if(est === 'gracia') gracia++;
+    else bloqueados++;
+  });
+  document.getElementById('r-activos').textContent = activos;
+  document.getElementById('r-total').textContent = CLIENTES.length;
+  document.getElementById('r-gracia').textContent = gracia;
+  document.getElementById('r-bloqueados').textContent = bloqueados;
+}
+
+function renderLista(clientes){
+  const cont = document.getElementById('lista-clientes');
+
+  if(CLIENTES.length === 0){
+    cont.innerHTML = `
+      <div class="estado-msg">
+        <div class="ico">📋</div>
+        <div class="txt">Sin clientes registrados todavía</div>
+        <div class="sub">Tocá "+ Agregar nuevo cliente" para cargar el primero</div>
+      </div>`;
+    return;
+  }
+
+  if(clientes.length === 0){
+    cont.innerHTML = `
+      <div class="estado-msg">
+        <div class="ico">🔍</div>
+        <div class="txt">No encontramos ese cliente</div>
+        <div class="sub">Probá con otro nombre</div>
+      </div>`;
+    return;
+  }
+
+  let h = '';
+  clientes.forEach(c => {
+    const estado = calcularEstado(c);
+    const dias = diasHasta(c.fecha_ultimo_pago);
+
+    let pillTxt = '🟢 Activo';
+    if(estado === 'gracia') pillTxt = dias >= 0 ? `🟡 Vence en ${dias}d` : `🟡 Vencido hace ${Math.abs(dias)}d`;
+    if(estado === 'bloqueado') pillTxt = '🔴 Bloqueado';
+
+    h += `<div class="ccard ${estado}">
+      <div class="ccard-top">
+        <div class="ccard-avatar">${avatarParaNombre(c.nombre_negocio)}</div>
+        <div class="ccard-info">
+          <div class="ccard-nombre">${esc(c.nombre_negocio || 'Sin nombre')}</div>
+          <div class="ccard-plan">Plan ${esc(c.plan || '—')} · ${planPrecio(c.plan)}</div>
+        </div>
+        <div class="estado-pill estado-${estado}">${pillTxt}</div>
+      </div>
+      <div class="ccard-det">
+        <div class="det-box"><div class="det-lbl">Último pago</div><div class="det-val">${c.fecha_ultimo_pago || '—'}</div></div>
+        <div class="det-box"><div class="det-lbl">Usuario</div><div class="det-val">${esc(c.usuario || '—')}</div></div>
+      </div>
+      <div class="tipo-calc-wrap">
+        <div class="tipo-calc-lbl">Tipo de calculadora</div>
+        <select class="tipo-calc-sel" onchange="cambiarTipoCalc(${c.id}, this.value)">
+          <option value="simple" ${(c.tipo_calculadora||'simple')==='simple'?'selected':''}>🍽️ Simple (Restaurante)</option>
+          <option value="distribuidor" ${c.tipo_calculadora==='distribuidor'?'selected':''}>📦 Distribuidor (IVA + Caja)</option>
+        </select>
+      </div>
+      <div class="ccard-actions">
+        ${estado !== 'activo'
+          ? `<button class="btn-pagado" onclick="marcarPagado(${c.id})">✓ Marcar pagado</button>`
+          : `<button class="btn-bloquear" onclick="bloquearCliente(${c.id})">Bloquear</button>`
+        }
+        ${estado === 'bloqueado'
+          ? `<button class="btn-activar" onclick="reactivarCliente(${c.id})">Reactivar</button>`
+          : ''
+        }
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = h;
+}
+
+// ═══════════ ACCIONES (escritura en Supabase) ═══════════
+async function marcarPagado(id){
+  const hoy = new Date().toISOString().split('T')[0];
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLA}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ fecha_ultimo_pago: hoy, estado: 'activo' })
+    });
+    if(!resp.ok) throw new Error('Error al actualizar');
+    toast('Pago registrado, acceso renovado por 30 días');
+    await cargarClientes();
+  } catch(err){
+    toast('Error al guardar. Revisá tu conexión.', true);
+  }
+}
+
+async function bloquearCliente(id){
+  if(!confirm('¿Bloquear el acceso de este cliente ahora?')) return;
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLA}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ estado: 'bloqueado' })
+    });
+    if(!resp.ok) throw new Error('Error al actualizar');
+    toast('Cliente bloqueado');
+    await cargarClientes();
+  } catch(err){
+    toast('Error al guardar. Revisá tu conexión.', true);
+  }
+}
+
+async function reactivarCliente(id){
+  const hoy = new Date().toISOString().split('T')[0];
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLA}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ estado: 'activo', fecha_ultimo_pago: hoy })
+    });
+    if(!resp.ok) throw new Error('Error al actualizar');
+    toast('Cliente reactivado');
+    await cargarClientes();
+  } catch(err){
+    toast('Error al guardar. Revisá tu conexión.', true);
+  }
+}
+
+async function cambiarTipoCalc(id, tipo){
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLA}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ tipo_calculadora: tipo })
+    });
+    if(!resp.ok) throw new Error('Error al actualizar');
+    toast(tipo === 'distribuidor' ? 'Calculadora cambiada a Distribuidor' : 'Calculadora cambiada a Simple');
+    const cliente = CLIENTES.find(c => c.id === id);
+    if(cliente) cliente.tipo_calculadora = tipo;
+  } catch(err){
+    toast('Error al guardar el cambio', true);
+  }
+}
+
+// ═══════════ MODAL NUEVO CLIENTE ═══════════
+function abrirModalNuevo(){
+  document.getElementById('nc-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-nuevo').classList.add('abierto');
+}
+function cerrarModal(){
+  document.getElementById('modal-nuevo').classList.remove('abierto');
+  ['nc-nombre','nc-usuario','nc-clave'].forEach(id => document.getElementById(id).value = '');
+}
+
+async function guardarClienteNuevo(){
+  const nombre = document.getElementById('nc-nombre').value.trim();
+  const usuario = document.getElementById('nc-usuario').value.trim();
+  const clave = document.getElementById('nc-clave').value.trim();
+  const plan = document.getElementById('nc-plan').value;
+  const fecha = document.getElementById('nc-fecha').value;
+
+  if(!nombre || !usuario || !clave){
+    toast('Completá nombre, usuario y clave', true);
+    return;
+  }
+
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLA}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        nombre_negocio: nombre,
+        usuario: usuario,
+        clave: clave,
+        plan: plan,
+        fecha_ultimo_pago: fecha,
+        estado: 'activo'
+      })
+    });
+    if(!resp.ok) throw new Error('Error al guardar');
+    toast(`"${nombre}" agregado correctamente`);
+    cerrarModal();
+    await cargarClientes();
+  } catch(err){
+    toast('Error al guardar el cliente. Revisá tu conexión.', true);
+  }
+}
+
+// ═══════════ CANDADO DE ACCESO ═══════════
+const CLAVE_ADMIN = '4729'; // cambiá este número por la clave que vos quieras
+
+function verificarClaveAdmin(){
+  const ingresada = document.getElementById('candado-clave').value;
+  const errorEl = document.getElementById('candado-error');
+
+  if(ingresada === CLAVE_ADMIN){
+    sessionStorage.setItem('gc_admin_ok', '1');
+    document.getElementById('candado-overlay').classList.add('oculto');
+    errorEl.classList.remove('vis');
+    cargarClientes();
+  } else {
+    errorEl.classList.add('vis');
+    document.getElementById('candado-clave').value = '';
+    document.getElementById('candado-clave').focus();
+  }
+}
+
+document.getElementById('candado-clave').addEventListener('keypress', function(e){
+  if(e.key === 'Enter') verificarClaveAdmin();
+});
+
+// ═══════════ INIT ═══════════
+if(sessionStorage.getItem('gc_admin_ok') === '1'){
+  document.getElementById('candado-overlay').classList.add('oculto');
+  cargarClientes();
+} else {
+  document.getElementById('candado-clave').focus();
+}
+</script>
+</body>
+</html>
